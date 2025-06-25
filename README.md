@@ -121,6 +121,108 @@ cd glowmart-backend
 - Runs on: http://localhost:5173
 
 ---
+
+---
+
+## **Complete Detailed Guide to Run from Sratch**
+
+[Developer setup Guide](./setup_instructions.md)
+
+---
+
+---
+
+# 🧩 Database Overview for GlowMart
+
+This document outlines the **tables**, **relationships**, and **how to access/view data** in the H2 in-memory database used in the GlowMart Fullstack Project.
+
+---
+
+## 📋 Tables Created
+
+When the backend runs, Spring Boot + JPA auto-generates the following tables:
+
+| Table Name         | Description                                 | Relationships                                            |
+| ------------------ | ------------------------------------------- | -------------------------------------------------------- |
+| `user_credentials` | Stores login info (email/mobile + password) | 1-to-1 with `user_details`                               |
+| `user_details`     | Stores user personal info                   | 1-to-1 with `user_credentials`                           |
+| `products`         | Product catalog                             | Independent                                              |
+| `customer`         | Checkout user address                       | 1-to-many with `orders`                                  |
+| `orders`           | Stores order summary                        | Many-to-one with `customer`, 1-to-many with `order_item` |
+| `order_item`       | Stores each product in an order             | Many-to-one with `orders`                                |
+
+> 🔄 `user_credentials` & `user_details` are created at registration. `customer`, `orders`, and `order_item` are created when a user places an order.
+
+---
+
+## 🔍 How to Access the H2 Console
+
+To inspect the database (view tables, run queries):
+
+### ✅ Step-by-step:
+
+1. Make sure the **backend server is running** using:
+
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
+2. Open your browser and navigate to:
+
+   ```
+   http://localhost:8080/h2-console
+   ```
+
+3. Use the following credentials:
+
+| Field     | Value                |
+| --------- | -------------------- |
+| JDBC URL  | `jdbc:h2:mem:glowmartdb` |
+| User Name | `sa`                 |
+| Password  | *(leave blank)*      |
+```html
+Note : Take details as per your configuration in backend application.properties
+```
+4. Click **Connect**.
+
+5. You’ll now see all tables in the left sidebar.
+
+---
+
+## 🧪 Sample SQL Queries
+
+Use the console to run queries like:
+
+```sql
+-- View all users
+SELECT * FROM user_details;
+SELECT * FROM user_credentials;
+
+-- View products
+SELECT * FROM products;
+
+-- View all orders
+SELECT * FROM orders;
+SELECT * FROM order_item;
+SELECT * FROM customer;
+
+-- Delete all data (for testing reset)
+DELETE FROM order_item;
+DELETE FROM orders;
+DELETE FROM customer;
+```
+
+> ⚠️ Note: Delete queries must respect foreign key constraints. You may need to delete `order_item` before `orders`, and `orders` before `customer`.
+
+---
+
+## 🔗 Optional Enhancements
+
+- Export data from the H2 console.
+- Add SQL migration scripts with Flyway or Liquibase.
+- Switch to MySQL/PostgreSQL in production environments.
+
+---
 ## ✅ Test Scenarios
 - Add multiple products to cart
 - Try ordering without login → should redirect to registration
@@ -201,7 +303,8 @@ cd glowmart-backend
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This document is part of the [GlowMart Fullstack App](https://github.com/Rdf1846/glowmart-fullstack.git) — MIT Licensed.
+see the [LICENSE](LICENSE) file for details.
 
 ---
 
